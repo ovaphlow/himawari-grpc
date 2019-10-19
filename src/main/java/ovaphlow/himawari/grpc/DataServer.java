@@ -2,12 +2,13 @@ package ovaphlow.himawari.grpc;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
-public class UtilServer {
-    private static final Logger logger = Logger.getLogger(UtilServer.class.getName());
+public class DataServer {
+    private static final Logger logger = LoggerFactory.getLogger(DataServer.class);
 
     private Server server;
 
@@ -23,7 +24,7 @@ public class UtilServer {
             @Override
             public void run() {
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
-                UtilServer.this.stop();
+                DataServer.this.stop();
                 System.err.println("*** server shut down");
             }
         });
@@ -42,7 +43,7 @@ public class UtilServer {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        final UtilServer server = new UtilServer();
+        final DataServer server = new DataServer();
         server.start();
         server.blockUntilShutdown();
     }

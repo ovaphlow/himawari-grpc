@@ -24,6 +24,8 @@ dependencies {
 
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
 
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+
     implementation "com.zaxxer:HikariCP-java7:2.4.13"
     implementation "org.postgresql:postgresql:42.2.7"
 }
@@ -50,8 +52,8 @@ sourceSets {
 startScripts.enabled = false
 
 task grpcServer(type: CreateStartScripts) {
-    mainClassName = 'ovaphlow.himawari.grpc.UtilServer'
-    applicationName = 'ovaphlow.himawari.grpc.server.201910-1'
+    mainClassName = 'ovaphlow.himawari.grpc.DataServer'
+    applicationName = 'ovaphlow.himawari.grpc.data-server.201910-1'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = startScripts.classpath
 }
