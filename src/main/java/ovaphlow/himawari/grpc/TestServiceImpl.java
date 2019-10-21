@@ -28,7 +28,7 @@ public class TestServiceImpl extends TestGrpc.TestImplBase {
         String result = "";
         Gson gson = new Gson();
         try {
-            Connection conn = DBHandler.getConn();
+            Connection conn = DBUtil.getConn();
             String sql = "select * from public.user limit 20";
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -55,7 +55,7 @@ public class TestServiceImpl extends TestGrpc.TestImplBase {
         Gson gson = new Gson();
         try {
             Map<String, Object> map = gson.fromJson(req.getData(), Map.class);
-            Connection conn = DBHandler.getConn();
+            Connection conn = DBUtil.getConn();
             String sql = "select * from public.user where id = ? limit 1";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, Integer.parseInt(map.get("id").toString()));

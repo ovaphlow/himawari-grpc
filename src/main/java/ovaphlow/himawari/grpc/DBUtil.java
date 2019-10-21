@@ -1,13 +1,38 @@
 package ovaphlow.himawari.grpc;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DBUtil {
+    private static HikariDataSource ds;
+
+    static {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:postgresql://192.168.1.246:5432/ovaphlow");
+        config.setUsername("kill8268");
+        config.setPassword("");
+        config.setMinimumIdle(0);
+        config.setMaximumPoolSize(8);
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+        ds = new HikariDataSource(config);
+    }
+
+    public static Connection getConn() throws SQLException {
+        return ds.getConnection();
+    }
+
     public static Map<String, Object> getMap(ResultSet rs) throws Exception {
         Map<String, Object> result = new HashMap<>();
         rs.next();
