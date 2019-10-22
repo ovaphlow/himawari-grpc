@@ -1,3 +1,5 @@
+import javax.tools.JavaCompiler
+
 plugins {
     id 'application'
     id 'com.google.protobuf' version '0.8.8'
@@ -8,8 +10,8 @@ repositories {
     jcenter()
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+//sourceCompatibility = 1.7
+//targetCompatibility = 1.7
 
 def grpcVersion = '1.24.0'
 def protobufVersion = '3.9.0'
@@ -51,14 +53,14 @@ sourceSets {
 
 startScripts.enabled = false
 
-task grpcServer(type: CreateStartScripts) {
-    mainClassName = 'ovaphlow.himawari.grpc.DataServer'
-    applicationName = 'ovaphlow.himawari.grpc.data-server.201910-1'
+task serviceServer(type: CreateStartScripts) {
+    mainClassName = 'ovaphlow.himawari.ServiceServer'
+    applicationName = 'ovaphlow.himawari.service-server.201910-1'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = startScripts.classpath
 }
 
 applicationDistribution.into('bin') {
-    from(grpcServer)
+    from(serviceServer)
     fileMode = 0755
 }

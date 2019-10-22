@@ -1,13 +1,14 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "ovaphlow.himawari.grpc";
+option java_package = "ovaphlow.himawari";
 option java_outer_classname = "ArchiveProto";
 
 package archive;
 
 service Archive {
     rpc search(ArchiveRequest) returns (ArchiveReply) {}
+    rpc filter(ArchiveRequest) returns (ArchiveReply) {}
     rpc list(ArchiveRequest) returns (ArchiveReply) {}
     rpc save(ArchiveRequest) returns (ArchiveReply) {}
     rpc get(ArchiveRequest) returns (ArchiveReply) {}

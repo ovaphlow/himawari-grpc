@@ -1,7 +1,6 @@
-package ovaphlow.himawari.grpc;
+package ovaphlow.himawari;
 
 import com.google.gson.Gson;
-import com.google.j2objc.annotations.ReflectionSupport;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,16 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             map.put("message", "gRPC服务器错误");
             resp = gson.toJson(map);
         }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void filter(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        String resp = "";
 
         ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
         responseObserver.onNext(reply);

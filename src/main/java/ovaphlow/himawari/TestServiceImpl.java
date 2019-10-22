@@ -1,4 +1,4 @@
-package ovaphlow.himawari.grpc;
+package ovaphlow.himawari;
 
 import com.google.gson.Gson;
 import io.grpc.stub.StreamObserver;

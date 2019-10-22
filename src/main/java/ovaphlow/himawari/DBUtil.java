@@ -1,4 +1,4 @@
-package ovaphlow.himawari.grpc;
+package ovaphlow.himawari;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
