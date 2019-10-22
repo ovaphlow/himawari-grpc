@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
@@ -22,10 +23,28 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Connection conn = DBUtil.getConn();
+            String sql = "select * from himawari.archive " +
+                    "where sn = ? or identity = ? " +
+                    "limit 2";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, body.get("keyword").toString());
+            ps.setString(2, body.get("keyword").toString());
+            ResultSet rs = ps.executeQuery();
+            List<Map<String, Object>> r = DBUtil.getList(rs);
             Map<String, Object> map = new HashMap<>();
-            map.put("message", "");
-            map.put("content", body.get("keyword").toString());
+            if (r.size() == 0) {
+                map.put("message", "未找到指定档案号/身份证的档案");
+                map.put("content", body.get("keyword").toString());
+            } else if (r.size() == 1) {
+                map.put("message", "");
+                map.put("content", r.get(0));
+            } else {
+                map.put("message", "您查询的档案号/身份证不是唯一数据，请联系系统管理员。");
+                map.put("content", body.get("keyword").toString());
+            }
             resp = gson.toJson(map);
+            conn.close();
         } catch (Exception e) {
             e.printStackTrace();
             Map<String, String> map = new HashMap<>();
@@ -42,6 +61,33 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
     @SuppressWarnings("unchecked")
     public void filter(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
         String resp = "";
+        Gson gson = new Gson();
+
+        try {
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Connection conn = DBUtil.getConn();
+            String sql = "select * from himawari.archive " +
+                    "where position(? in sn) > 0 " +
+                    "and position(? in identity) > 0 " +
+                    "and position(? in name) > 0 " +
+                    "limit 2000";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, body.get("sn").toString());
+            ps.setString(2, body.get("identity").toString());
+            ps.setString(3, body.get("name").toString());
+            ResultSet rs = ps.executeQuery();
+            List<Map<String, Object>> r = DBUtil.getList(rs);
+            Map<String, Object> map = new HashMap<>();
+            map.put("message", "");
+            map.put("content", r);
+            resp = gson.toJson(map);
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "gRPC服务器错误");
+            resp = gson.toJson(map);
+        }
 
         ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
         responseObserver.onNext(reply);
