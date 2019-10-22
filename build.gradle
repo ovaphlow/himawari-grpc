@@ -53,6 +53,10 @@ sourceSets {
 
 startScripts.enabled = false
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
 task serviceServer(type: CreateStartScripts) {
     mainClassName = 'ovaphlow.himawari.ServiceServer'
     applicationName = 'ovaphlow.himawari.service-server.201910-1'
