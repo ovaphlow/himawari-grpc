@@ -211,8 +211,57 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Double d = Double.parseDouble(body.get("id").toString());
             Connection conn = DBUtil.getConn();
-            String sql = "";
+            String sql = "update himawari.archive " +
+                    "set sn = ?, sn_alt = ?, " +
+                    "identity = ?, name = ?, birthday = ?, " +
+                    "cangongshijian = ?, zhicheng = ?, gongling = ?, " +
+                    "yutuixiuriqi = ?, tuixiuriqi = ?, suozaidi = ?, " +
+                    "remark = ? " +
+                    "where id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, body.get("sn").toString());
+            ps.setString(2, body.get("sn_alt").toString());
+            ps.setString(3, body.get("identity").toString());
+            ps.setString(4, body.get("name").toString());
+            ps.setString(5, body.get("birthday").toString());
+            ps.setString(6, body.get("cangongshijian").toString());
+            ps.setString(7, body.get("zhicheng").toString());
+            ps.setString(8, body.get("gongling").toString());
+            ps.setString(9, body.get("yutuixiuriqi").toString());
+            ps.setString(10, body.get("tuixiuriqi").toString());
+            ps.setString(11, body.get("suozaidi").toString());
+            ps.setString(12, body.get("remark").toString());
+            ps.setInt(13, d.intValue());
+            ps.execute();
+            Map<String, Object> map = new HashMap<>();
+            map.put("message", "");
+            map.put("content", "");
+            resp = gson.toJson(map);
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "gRPC服务器错误");
+            resp = gson.toJson(map);
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void remove(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        String resp = "";
+        Gson gson = new Gson();
+
+        try {
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Connection conn = DBUtil.getConn();
+            String sql = "delete from himawari.archive where id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, Integer.parseInt(body.get("id").toString()));
             ps.execute();
