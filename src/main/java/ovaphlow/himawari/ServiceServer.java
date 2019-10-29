@@ -17,6 +17,7 @@ public class ServiceServer {
         server = ServerBuilder.forPort(port)
                 .addService(new TestServiceImpl())
                 .addService(new ArchiveServiceImpl())
+                .addService(new DeptServiceImpl())
                 .addService(new UserServiceImpl())
                 .build()
                 .start();
