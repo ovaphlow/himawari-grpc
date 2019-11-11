@@ -134,7 +134,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             Connection conn = DBUtil.getConn();
             String sql = "insert into himawari.archive " +
                     "(sn, sn_alt, identity, name, birthday, " +
-                    "cangongshijian, zhicheng, gongling, yutuixiuriqi, tuixiuriqi, suozaidi, " +
+                    "cangongshijian, zhicheng, gongling, yutuixiuriqi, tuixiuriqi, vault_id, " +
                     "remark) " +
                     "values " +
                     "(?, ?, ?, ?, ?, " +
@@ -152,7 +152,8 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             ps.setString(8, body.get("gongling").toString());
             ps.setString(9, body.get("yutuixiuriqi").toString());
             ps.setString(10, body.get("tuixiuriqi").toString());
-            ps.setString(11, body.get("suozaidi").toString());
+            Double vaultId = Double.parseDouble(body.get("vault_id").toString());
+            ps.setInt(11, vaultId.intValue());
             ps.setString(12, body.get("remark").toString());
             ResultSet rs = ps.executeQuery();
             Map<String, Object> r = DBUtil.getMap(rs);
@@ -217,7 +218,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
                     "set sn = ?, sn_alt = ?, " +
                     "identity = ?, name = ?, birthday = ?, " +
                     "cangongshijian = ?, zhicheng = ?, gongling = ?, " +
-                    "yutuixiuriqi = ?, tuixiuriqi = ?, suozaidi = ?, " +
+                    "yutuixiuriqi = ?, tuixiuriqi = ?, vault_id = ?, " +
                     "remark = ? " +
                     "where id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -231,7 +232,8 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             ps.setString(8, body.get("gongling").toString());
             ps.setString(9, body.get("yutuixiuriqi").toString());
             ps.setString(10, body.get("tuixiuriqi").toString());
-            ps.setString(11, body.get("suozaidi").toString());
+            Double vaultId = Double.parseDouble(body.get("vault_id").toString());
+            ps.setInt(11, vaultId.intValue());
             ps.setString(12, body.get("remark").toString());
             ps.setInt(13, d.intValue());
             ps.execute();
