@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "ovaphlow.himawari";
+option java_outer_classname = "PictureProto";
+
+package picture;
+
+service Picture {
+    rpc list(PictureRequest) returns (PictureReply) {}
+    rpc save(PictureRequest) returns (PictureReply) {}
+    rpc get(PictureRequest) returns (PictureReply) {}
+    rpc update(PictureRequest) returns (PictureReply) {}
+    rpc remove(PictureRequest) returns (PictureReply) {}
+}
+
+message PictureRequest { string data = 1; }
+
+message PictureReply { string data = 1; }
