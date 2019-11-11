@@ -15,10 +15,10 @@ public class ServiceServer {
     private void start() throws IOException {
         int port = 5001;
         server = ServerBuilder.forPort(port)
-                .addService(new TestServiceImpl())
                 .addService(new ArchiveServiceImpl())
                 .addService(new DeptServiceImpl())
                 .addService(new UserServiceImpl())
+                .addService(new VaultServiceImpl())
                 .build()
                 .start();
         logger.info("服务启动于端口 " + port);
