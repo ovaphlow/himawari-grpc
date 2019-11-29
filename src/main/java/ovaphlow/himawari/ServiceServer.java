@@ -15,6 +15,7 @@ public class ServiceServer {
     private void start() throws IOException {
         int port = 5001;
         server = ServerBuilder.forPort(port)
+                .maxInboundMessageSize(1024 * 1024 * 256)
                 .addService(new ArchiveServiceImpl())
                 .addService(new DeptServiceImpl())
                 .addService(new UserServiceImpl())

@@ -283,4 +283,94 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void listPicture(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "select id, master_id, content from himawari.picture where master_id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Double id = Double.parseDouble(body.get("id").toString());
+            ps.setInt(1, id.intValue());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getList(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void saveBase64(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "insert into himawari.picture " +
+                    "(master_id, content) " +
+                    "values (?, ?) " +
+                    "returning id";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Double id = Double.parseDouble(body.get("master_id").toString());
+            ps.setInt(1, id.intValue());
+            ps.setString(2, body.get("content").toString());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getMap(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void getPicture(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "select * from himawari.picture where id = ? and master_id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Double id = Double.parseDouble(body.get("id").toString());
+            ps.setInt(1, id.intValue());
+            Double master_id = Double.parseDouble(body.get("master_id").toString());
+            ps.setInt(2, master_id.intValue());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getMap(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
 }
