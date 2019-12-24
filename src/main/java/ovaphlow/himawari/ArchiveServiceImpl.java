@@ -349,6 +349,61 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
 
     @Override
     @SuppressWarnings("unchecked")
+    public void transferOut(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "insert into himawari.archive_isolate " +
+                    "(original_id, sn, sn_alt, identity, name, birthday, " +
+                    "cangongshijian, zhicheng, gongling, yutuixiuriqi, tuixiuriqi, " +
+                    "remark, vault_id, reason) " +
+                    "values " +
+                    "(?, ?, ?, ?, ?, ?, " +
+                    "?, ?, ?, ?, ?, " +
+                    "?, ?, ?) " +
+                    "returning id";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Double id = Double.parseDouble(body.get("id").toString());
+            ps.setInt(1, id.intValue());
+            ps.setString(2, body.get("sn").toString());
+            ps.setString(3, body.get("sn_alt").toString());
+            ps.setString(4, body.get("identity").toString());
+            ps.setString(5, body.get("name").toString());
+            ps.setString(6, body.get("birthday").toString());
+            ps.setString(7, body.get("cangongshijian").toString());
+            ps.setString(8, body.get("zhicheng").toString());
+            ps.setString(9, body.get("gongling").toString());
+            ps.setString(10, body.get("yutuixiuriqi").toString());
+            ps.setString(11, body.get("tuixiuriqi").toString());
+            ps.setString(12, body.get("remark").toString());
+            Double vault_id = Double.parseDouble((body.get("vault_id").toString()));
+            ps.setInt(13, vault_id.intValue());
+            ps.setString(14, body.get("reason").toString());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getMap(rs));
+            sql = "delete from himawari.archive where id = ?";
+            ps.clearParameters();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, id.intValue());
+            ps.execute();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void listPicture(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
         Map<String, Object> resp = new HashMap<>();
         resp.put("message", "");
