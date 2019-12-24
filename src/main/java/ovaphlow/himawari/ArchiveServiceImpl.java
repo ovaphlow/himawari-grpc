@@ -354,13 +354,19 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
 
         try {
             Connection conn = DBUtil.getConn();
-            String sql = "select * from himawari.picture where id = ? and master_id = ?";
+            String sql = "select id, master_id, content, " +
+                    "(select id from himawari.picture where id < ? order by id desc limit 1) as prev_id, " +
+                    "(select id from himawari.picture where id > ? order by id limit 1) as next_id " +
+                    "from himawari.picture " +
+                    "where id = ? and master_id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
             Double id = Double.parseDouble(body.get("id").toString());
             ps.setInt(1, id.intValue());
+            ps.setInt(2, id.intValue());
+            ps.setInt(3, id.intValue());
             Double master_id = Double.parseDouble(body.get("master_id").toString());
-            ps.setInt(2, master_id.intValue());
+            ps.setInt(4, master_id.intValue());
             ResultSet rs = ps.executeQuery();
             resp.put("content", DBUtil.getMap(rs));
             conn.close();
