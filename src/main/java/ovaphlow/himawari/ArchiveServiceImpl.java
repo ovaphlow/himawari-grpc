@@ -25,7 +25,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
             Connection conn = DBUtil.getConn();
             String sql = "select * from himawari.archive " +
-                    "where sn = ? or identity = ? " +
+                    "where sn = ? or identity = ? or position(? in sn_alt) > 0" +
                     "limit 2";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, body.get("keyword").toString());
@@ -96,10 +96,73 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
 
     @Override
     @SuppressWarnings("unchecked")
+    public void checkValid(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "select id, sn, sn_alt, identity " +
+                    "from himawari.archive " +
+                    "where sn = ? or identity = ? " +
+                    "limit 2";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            ps.setString(1, body.get("sn").toString());
+            ps.setString(2, body.get("identity").toString());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getList(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void checkValidWithId(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "select id, sn, sn_alt, identity " +
+                    "from himawari.archive " +
+                    "where (sn = ? or identity = ?) and id != ? " +
+                    "limit 2";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            ps.setString(1, body.get("sn").toString());
+            ps.setString(2, body.get("identity").toString());
+            Double id = Double.parseDouble(body.get("id").toString());
+            ps.setInt(3, id.intValue());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getList(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void list(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
         String resp = "";
         Gson gson = new Gson();
-        logger.info("list archives");
 
         try {
             Connection conn = DBUtil.getConn();
