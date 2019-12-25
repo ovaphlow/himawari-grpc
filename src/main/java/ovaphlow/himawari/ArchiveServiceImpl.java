@@ -349,6 +349,60 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
 
     @Override
     @SuppressWarnings("unchecked")
+    public void transferIn(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "insert into himawari.archive " +
+                    "(sn, sn_alt, identity, name, birthday, " +
+                    "cangongshijian, zhicheng, gongling, yutuixiuriqi, tuixiuriqi, " +
+                    "remark, vault_id, phone) " +
+                    "values " +
+                    "(?, ?, ?, ?, ?, " +
+                    "?, ?, ?, ?, ?, " +
+                    "?, ?, ?) " +
+                    "returning id";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Double id = Double.parseDouble(body.get("id").toString());
+            ps.setString(1, body.get("sn").toString());
+            ps.setString(2, body.get("sn_alt").toString());
+            ps.setString(3, body.get("identity").toString());
+            ps.setString(4, body.get("name").toString());
+            ps.setString(5, body.get("birthday").toString());
+            ps.setString(6, body.get("cangongshijian").toString());
+            ps.setString(7, body.get("zhicheng").toString());
+            ps.setString(8, body.get("gongling").toString());
+            ps.setString(9, body.get("yutuixiuriqi").toString());
+            ps.setString(10, body.get("tuixiuriqi").toString());
+            ps.setString(11, body.get("remark").toString());
+            Double vault_id = Double.parseDouble((body.get("vault_id").toString()));
+            ps.setInt(12, vault_id.intValue());
+            ps.setString(13, body.get("phone").toString());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getMap(rs));
+            sql = "delete from himawari.archive_isolate where id = ?";
+            ps.clearParameters();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, id.intValue());
+            ps.execute();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void transferOut(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
         Map<String, Object> resp = new HashMap<>();
         resp.put("message", "");
@@ -487,6 +541,134 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             ps.setInt(4, master_id.intValue());
             ResultSet rs = ps.executeQuery();
             resp.put("content", DBUtil.getMap(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void listIsolate(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "select * from himawari.archive_isolate order by id desc limit 2000";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getList(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void getIsolate(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "select * from himawari.archive_isolate where id = ? limit 1";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Double id = Double.parseDouble(body.get("id").toString());
+            ps.setInt(1, id.intValue());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getMap(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void updateIsolate(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "update himawari.archive_isolate " +
+                    "set sn = ?, sn_alt = ?, identity = ?, name = ?, birthday = ?, " +
+                    "cangongshijian = ?, zhicheng = ?, gongling = ?, " +
+                    "yutuixiuriqi = ?, tuixiuriqi = ?, " +
+                    "remark = ?, vault_id = ?, " +
+                    "reason = ?, phone = ? " +
+                    "where id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            ps.setString(1, body.get("sn").toString());
+            ps.setString(2, body.get("sn_alt").toString());
+            ps.setString(3, body.get("identity").toString());
+            ps.setString(4, body.get("name").toString());
+            ps.setString(5, body.get("birthday").toString());
+            ps.setString(6, body.get("cangongshijian").toString());
+            ps.setString(7, body.get("zhicheng").toString());
+            ps.setString(8, body.get("gongling").toString());
+            ps.setString(9, body.get("yutuixiuriqi").toString());
+            ps.setString(10, body.get("tuixiuriqi").toString());
+            ps.setString(11, body.get("remark").toString());
+            Double vault_id = Double.parseDouble(body.get("vault_id").toString());
+            ps.setInt(12, vault_id.intValue());
+            ps.setString(13, body.get("reason").toString());
+            ps.setString(14, body.get("phone").toString());
+            Double id = Double.parseDouble(body.get("id").toString());
+            ps.setInt(15, id.intValue());
+            ps.execute();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void removeIsolate(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "delete from himawari.archive_isolate where id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            Double id = Double.parseDouble(body.get("id").toString());
+            ps.setInt(1, id.intValue());
+            ps.execute();
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
