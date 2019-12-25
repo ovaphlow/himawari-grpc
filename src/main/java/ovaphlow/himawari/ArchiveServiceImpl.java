@@ -202,7 +202,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
                     "values " +
                     "(?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, " +
-                    "?)" +
+                    "?, ?)" +
                     " returning id";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, body.get("sn").toString());
@@ -218,6 +218,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             Double vaultId = Double.parseDouble(body.get("vault_id").toString());
             ps.setInt(11, vaultId.intValue());
             ps.setString(12, body.get("remark").toString());
+            ps.setString(13, body.get("phone").toString());
             ResultSet rs = ps.executeQuery();
             Map<String, Object> r = DBUtil.getMap(rs);
             Map<String, Object> map = new HashMap<>();
@@ -282,7 +283,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
                     "identity = ?, name = ?, birthday = ?, " +
                     "cangongshijian = ?, zhicheng = ?, gongling = ?, " +
                     "yutuixiuriqi = ?, tuixiuriqi = ?, vault_id = ?, " +
-                    "remark = ? " +
+                    "remark = ?, phone = ? " +
                     "where id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, body.get("sn").toString());
@@ -298,7 +299,8 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             Double vaultId = Double.parseDouble(body.get("vault_id").toString());
             ps.setInt(11, vaultId.intValue());
             ps.setString(12, body.get("remark").toString());
-            ps.setInt(13, d.intValue());
+            ps.setString(13, body.get("phone").toString());
+            ps.setInt(14, d.intValue());
             ps.execute();
             Map<String, Object> map = new HashMap<>();
             map.put("message", "");
