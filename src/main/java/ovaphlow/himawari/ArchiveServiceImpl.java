@@ -202,8 +202,8 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
                     "values " +
                     "(?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, " +
-                    "?, ?)" +
-                    " returning id";
+                    "?, ?) " +
+                    "returning id";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, body.get("sn").toString());
             ps.setString(2, body.get("sn_alt").toString());
