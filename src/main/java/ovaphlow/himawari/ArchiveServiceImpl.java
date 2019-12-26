@@ -681,4 +681,37 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void filterIsolate(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
+        Gson gson = new Gson();
+
+        try {
+            Connection conn = DBUtil.getConn();
+            String sql = "select * from himawari.archive_isolate " +
+                    "where position(? in sn) > 0 " +
+                    "and position(? in identity) > 0 " +
+                    "and position(? in name) > 0 " +
+                    "limit 2000";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            ps.setString(1, body.get("sn").toString());
+            ps.setString(2, body.get("identity").toString());
+            ps.setString(3, body.get("name").toString());
+            ResultSet rs = ps.executeQuery();
+            resp.put("content", DBUtil.getList(rs));
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("message", "gRPC服务器错误");
+        }
+
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
 }

@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class ServiceServer {
-    private static final Logger logger = LoggerFactory.getLogger(ServiceServer.class);
+public class DataService {
+    private static final Logger logger = LoggerFactory.getLogger(DataService.class);
 
     private Server server;
 
@@ -27,7 +27,7 @@ public class ServiceServer {
             @Override
             public void run() {
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
-                ServiceServer.this.stop();
+                DataService.this.stop();
                 System.err.println("*** server shut down");
             }
         });
@@ -46,7 +46,7 @@ public class ServiceServer {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        final ServiceServer server = new ServiceServer();
+        final DataService server = new DataService();
         server.start();
         server.blockUntilShutdown();
     }
