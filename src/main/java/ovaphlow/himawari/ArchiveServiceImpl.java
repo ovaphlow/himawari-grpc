@@ -198,7 +198,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             String sql = "insert into himawari.archive " +
                     "(sn, sn_alt, identity, name, birthday, " +
                     "cangongshijian, zhicheng, gongling, yutuixiuriqi, tuixiuriqi, vault_id, " +
-                    "remark) " +
+                    "remark, phone) " +
                     "values " +
                     "(?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, " +
