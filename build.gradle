@@ -26,6 +26,7 @@ dependencies {
 
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
 
+    implementation "commons-cli:commons-cli:1.4"
     implementation "ch.qos.logback:logback-classic:1.2.3"
 
     implementation "com.zaxxer:HikariCP-java7:2.4.13"
