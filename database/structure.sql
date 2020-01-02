@@ -10,11 +10,11 @@ CREATE TABLE public."user" (
 
 CREATE TABLE public.common (
 	id serial NOT NULL,
-master_id int4 NOT NULL,
-k varchar(20) NOT NULL,
-v varchar(50) NOT NULL,
-remark varchar(200) NOT NULL,
-CONSTRAINT dept_pk PRIMARY KEY (id)
+    master_id int4 NOT NULL,
+    k varchar(20) NOT NULL,
+    v varchar(50) NOT NULL,
+    remark varchar(200) NOT NULL,
+    CONSTRAINT dept_pk PRIMARY KEY (id)
 );
 
 CREATE TABLE himawari.archive (
