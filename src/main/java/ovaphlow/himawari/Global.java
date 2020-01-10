@@ -2,11 +2,9 @@ package ovaphlow.himawari;
 
 public class Global {
     private static int PORT = 5001;
-    private static String DB_HOST = "192.168.1.246";
-    private static String DB_PORT = "5432";
+    private static String DB_URL = "192.168.1.246:5432/ovaphlow";
     private static String DB_USERNAME = "kill8268";
     private static String DB_PASSWORD = "";
-    private static String DB_NAME = "ovaphlow";
     private static int DB_POOL_SIZE = 4;
 
     public static int getPORT() {
@@ -17,20 +15,12 @@ public class Global {
         PORT = port;
     }
 
-    public static String getDbHost() {
-        return DB_HOST;
+    public static String getDbUrl() {
+        return DB_URL;
     }
 
-    public static void setDbHost(String dbHost) {
-        DB_HOST = dbHost;
-    }
-
-    public static String getDbPort() {
-        return DB_PORT;
-    }
-
-    public static void setDbPort(String dbPort) {
-        DB_PORT = dbPort;
+    public static void setDbUrl(String dbUrl) {
+        DB_URL = dbUrl;
     }
 
     public static String getDbUsername() {
@@ -47,14 +37,6 @@ public class Global {
 
     public static void setDbPassword(String dbPassword) {
         DB_PASSWORD = dbPassword;
-    }
-
-    public static String getDbName() {
-        return DB_NAME;
-    }
-
-    public static void setDbName(String dbName) {
-        DB_NAME = dbName;
     }
 
     public static int getDbPoolSize() {

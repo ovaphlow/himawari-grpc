@@ -17,7 +17,7 @@ public class DBUtil {
 
     static {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:postgresql://" + Global.getDbHost() + ":" + Global.getDbPort() + "/" + Global.getDbName());
+        config.setJdbcUrl("jdbc:postgresql://" + Global.getDbUrl());
         config.setUsername(Global.getDbUsername());
         config.setPassword(Global.getDbPassword());
 //        config.setMinimumIdle(0);

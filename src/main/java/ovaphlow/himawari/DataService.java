@@ -49,33 +49,31 @@ public class DataService {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         final Options options = new Options();
-        options.addOption(new Option("P", "port", true, "服务使用的端口"));
-        options.addOption(new Option("", "db_host", true, "数据库服务IP地址"));
-        options.addOption(new Option("", "db_port", true, "数据库服务端口"));
-        options.addOption(new Option("", "db_username", true, "数据库用户"));
-        options.addOption(new Option("", "db_password", true, "数据库密码"));
-        options.addOption(new Option("", "db_name", true, "数据库名"));
-        options.addOption(new Option("", "db_pool_size", true, "数据库连接池容量"));
+        options.addOption(new Option("h", "help", false, "HELP"));
+        options.addOption(new Option("p","port", true, "服务使用的端口"));
+        options.addOption(new Option("L", "db_url", true, "数据库连接地址(IP:PORT/NAME)"));;
+        options.addOption(new Option("U", "db_username", true, "数据库用户"));
+        options.addOption(new Option("P", "db_password", true, "数据库密码"));
+        options.addOption(new Option("S", "db_pool_size", true, "数据库连接池容量"));
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine cmd = parser.parse(options, args);
+            if (cmd.hasOption("help")) {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("ls", options);
+                System.exit(0);
+            }
             if (cmd.hasOption("port")) {
                 Global.setPORT(Integer.parseInt(cmd.getOptionValue("port")));
             }
-            if (cmd.hasOption("db_host")) {
-                Global.setDbHost(cmd.getOptionValue("db_host"));
-            }
-            if (cmd.hasOption("db_port")) {
-                Global.setDbPort(cmd.getOptionValue("db_port"));
+            if (cmd.hasOption("db_url")) {
+                Global.setDbUrl(cmd.getOptionValue("db_url"));
             }
             if (cmd.hasOption("db_username")) {
                 Global.setDbUsername(cmd.getOptionValue("db_username"));
             }
             if (cmd.hasOption("db_password")) {
                 Global.setDbPassword(cmd.getOptionValue("db_password"));
-            }
-            if (cmd.hasOption("db_name")) {
-                Global.setDbName(cmd.getOptionValue("db_name"));
             }
             if (cmd.hasOption("db_pool_size")) {
                 Global.setDbPoolSize(Integer.parseInt(cmd.getOptionValue("db_pool_size")));
