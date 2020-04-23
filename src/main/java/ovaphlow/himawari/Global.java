@@ -3,8 +3,8 @@ package ovaphlow.himawari;
 public class Global {
     private static int PORT = 5001;
     private static String DB_URL = "192.168.1.246:5432/ovaphlow";
-    private static String DB_USERNAME = "kill8268";
-    private static String DB_PASSWORD = "";
+    private static String DB_USERNAME = "hengda";
+    private static String DB_PASSWORD = "srd@HD.1123";
     private static int DB_POOL_SIZE = 4;
 
     public static int getPORT() {

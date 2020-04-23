@@ -30,6 +30,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, body.get("keyword").toString());
             ps.setString(2, body.get("keyword").toString());
+            ps.setString(3, body.get("keyword").toString());
             ResultSet rs = ps.executeQuery();
             List<Map<String, Object>> r = DBUtil.getList(rs);
             Map<String, Object> map = new HashMap<>();
