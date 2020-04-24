@@ -17,8 +17,10 @@ public class UserServiceImpl extends UserGrpc.UserImplBase {
     @Override
     @SuppressWarnings("unchecked")
     public void list(UserRequest req, StreamObserver<UserReply> responseObserver) {
-        String resp = "";
         Gson gson = new Gson();
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
 
         try {
             Connection conn = DBUtil.getConn();
@@ -30,19 +32,14 @@ public class UserServiceImpl extends UserGrpc.UserImplBase {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "");
-            map.put("content", DBUtil.getList(rs));
-            resp = gson.toJson(map);
+            resp.put("content", DBUtil.getList(rs));
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> map = new HashMap<>();
-            map.put("message", "gRPC服务器错误");
-            resp = gson.toJson(map);
+            resp.put("message", "gRPC服务器错误");
         }
 
-        UserReply reply = UserReply.newBuilder().setData(resp).build();
+        UserReply reply = UserReply.newBuilder().setData(gson.toJson(resp)).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
@@ -57,6 +54,7 @@ public class UserServiceImpl extends UserGrpc.UserImplBase {
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
+            logger.info("{}", body);
             Double d = Double.parseDouble(body.get("dept_id").toString());
             Connection conn = DBUtil.getConn();
             String sql = "insert into public.user " +
@@ -71,7 +69,8 @@ public class UserServiceImpl extends UserGrpc.UserImplBase {
             ps.setString(5, body.get("remark").toString());
             ResultSet rs = ps.executeQuery();
             Map<String, Object> map = DBUtil.getMap(rs);
-            resp.put("content", DBUtil.getMap(rs));
+            resp.put("content", map);
+            logger.info("{}", map);
             sql = "insert into himawari.auth " +
                     "(user_id, super) " +
                     "values (?, ?)";

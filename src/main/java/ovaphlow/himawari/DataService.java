@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class DataService {
     private static final Logger logger = LoggerFactory.getLogger(DataService.class);
@@ -14,7 +15,6 @@ public class DataService {
     private Server server;
 
     private void start() throws IOException {
-//        int port = 5001;
         server = ServerBuilder.forPort(Global.getPORT())
                 .maxInboundMessageSize(1024 * 1024 * 256)
                 .addService(new ArchiveServiceImpl())
@@ -23,21 +23,24 @@ public class DataService {
                 .addService(new VaultServiceImpl())
                 .build()
                 .start();
-//        logddger.info("服务启动于端口 " + port);
         logger.info("服务启动于端口 " + Global.getPORT());
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
-                DataService.this.stop();
+                try {
+                    DataService.this.stop();
+                } catch (InterruptedException e) {
+                    e.printStackTrace(System.err);
+                }
                 System.err.println("*** server shut down");
             }
         });
     }
 
-    private void stop() {
+    private void stop() throws InterruptedException {
         if (server != null) {
-            server.shutdown();
+            server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
     }
 

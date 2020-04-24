@@ -15,11 +15,18 @@ import java.util.Map;
 public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
     private static final Logger logger = LoggerFactory.getLogger(ArchiveServiceImpl.class);
 
+    /**
+     * 20200424 调整写法
+     * @param req
+     * @param responseObserver
+     */
     @Override
     @SuppressWarnings("unchecked")
     public void search(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
-        String resp = "";
         Gson gson = new Gson();
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -33,27 +40,23 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             ps.setString(3, body.get("keyword").toString());
             ResultSet rs = ps.executeQuery();
             List<Map<String, Object>> r = DBUtil.getList(rs);
-            Map<String, Object> map = new HashMap<>();
             if (r.size() == 0) {
-                map.put("message", "未找到指定档案号/身份证的档案");
-                map.put("content", body.get("keyword").toString());
+                resp.put("message", "未找到指定档案号/身份证的档案");
+                resp.put("content", body.get("keyword").toString());
             } else if (r.size() == 1) {
-                map.put("message", "");
-                map.put("content", r.get(0));
+                resp.put("message", "");
+                resp.put("content", r.get(0));
             } else {
-                map.put("message", "您查询的档案号/身份证不是唯一数据，请联系系统管理员。");
-                map.put("content", body.get("keyword").toString());
+                resp.put("message", "您查询的档案号/身份证不是唯一数据，请联系系统管理员。");
+                resp.put("content", body.get("keyword").toString());
             }
-            resp = gson.toJson(map);
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> map = new HashMap<>();
-            map.put("message", "gRPC服务器错误");
-            resp = gson.toJson(map);
+            resp.put("message", "gRPC服务器错误");
         }
 
-        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }

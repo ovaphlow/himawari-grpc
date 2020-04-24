@@ -1,5 +1,3 @@
-import javax.tools.JavaCompiler
-
 plugins {
     id 'application'
     id 'com.google.protobuf' version '0.8.8'
@@ -13,8 +11,8 @@ repositories {
 //sourceCompatibility = 1.7
 //targetCompatibility = 1.7
 
-def grpcVersion = '1.24.0'
-def protobufVersion = '3.9.0'
+def grpcVersion = '1.28.1'
+def protobufVersion = '3.11.0'
 def protocVersion = protobufVersion
 
 dependencies {
@@ -29,8 +27,8 @@ dependencies {
     implementation "commons-cli:commons-cli:1.4"
     implementation "ch.qos.logback:logback-classic:1.2.3"
 
-    implementation "com.zaxxer:HikariCP-java7:2.4.13"
-    implementation "org.postgresql:postgresql:42.2.7"
+    implementation "com.zaxxer:HikariCP:3.4.2"
+    implementation "org.postgresql:postgresql:42.2.12"
 }
 
 protobuf {
@@ -58,14 +56,14 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-task serviceServer(type: CreateStartScripts) {
+task dataService(type: CreateStartScripts) {
     mainClassName = 'ovaphlow.himawari.DataService'
-    applicationName = 'ovaphlow.himawari.data-service.201912-1'
+    applicationName = 'ovaphlow.himawari.data-service.202004-1'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = startScripts.classpath
 }
 
 applicationDistribution.into('bin') {
-    from(serviceServer)
+    from(dataService)
     fileMode = 0755
 }
