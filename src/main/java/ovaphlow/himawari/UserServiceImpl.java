@@ -54,7 +54,6 @@ public class UserServiceImpl extends UserGrpc.UserImplBase {
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
-            logger.info("{}", body);
             Double d = Double.parseDouble(body.get("dept_id").toString());
             Connection conn = DBUtil.getConn();
             String sql = "insert into public.user " +
@@ -70,7 +69,6 @@ public class UserServiceImpl extends UserGrpc.UserImplBase {
             ResultSet rs = ps.executeQuery();
             Map<String, Object> map = DBUtil.getMap(rs);
             resp.put("content", map);
-            logger.info("{}", map);
             sql = "insert into himawari.auth " +
                     "(user_id, super) " +
                     "values (?, ?)";

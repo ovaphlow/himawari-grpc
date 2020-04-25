@@ -64,8 +64,10 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
     @Override
     @SuppressWarnings("unchecked")
     public void filter(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
-        String resp = "";
         Gson gson = new Gson();
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -81,19 +83,14 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             ps.setString(3, body.get("name").toString());
             ResultSet rs = ps.executeQuery();
             List<Map<String, Object>> r = DBUtil.getList(rs);
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "");
-            map.put("content", r);
-            resp = gson.toJson(map);
+            resp.put("content", r);
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> map = new HashMap<>();
-            map.put("message", "gRPC服务器错误");
-            resp = gson.toJson(map);
+            resp.put("message", "gRPC服务器错误");
         }
 
-        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
@@ -165,8 +162,10 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
     @Override
     @SuppressWarnings("unchecked")
     public void list(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
-        String resp = "";
         Gson gson = new Gson();
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
 
         try {
             Connection conn = DBUtil.getConn();
@@ -174,18 +173,14 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             Map<String, Object> map = new HashMap<>();
-            map.put("message", "");
-            map.put("content", DBUtil.getList(rs));
-            resp = gson.toJson(map);
+            resp.put("content", DBUtil.getList(rs));
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> map = new HashMap<>();
-            map.put("message", "gRPC服务器错误");
-            resp = gson.toJson(map);
+            resp.put("message", "gRPC服务器错误");
         }
 
-        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
@@ -193,8 +188,10 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
     @Override
     @SuppressWarnings("unchecked")
     public void save(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
-        String resp = "";
         Gson gson = new Gson();
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -202,11 +199,11 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             String sql = "insert into himawari.archive " +
                     "(sn, sn_alt, identity, name, birthday, " +
                     "cangongshijian, zhicheng, gongling, yutuixiuriqi, tuixiuriqi, vault_id, " +
-                    "remark, phone) " +
+                    "remark, phone, gender) " +
                     "values " +
                     "(?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, " +
-                    "?, ?) " +
+                    "?, ?, ?) " +
                     "returning id";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, body.get("sn").toString());
@@ -223,21 +220,17 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             ps.setInt(11, vaultId.intValue());
             ps.setString(12, body.get("remark").toString());
             ps.setString(13, body.get("phone").toString());
+            ps.setString(14, body.get("gender").toString());
             ResultSet rs = ps.executeQuery();
             Map<String, Object> r = DBUtil.getMap(rs);
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "");
-            map.put("content", Integer.parseInt(r.get("id").toString()));
-            resp = gson.toJson(map);
+            resp.put("content", Integer.parseInt(r.get("id").toString()));
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> map = new HashMap<>();
-            map.put("message", "gRPC服务器错误");
-            resp = gson.toJson(map);
+            resp.put("message", "gRPC服务器错误");
         }
 
-        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
@@ -245,8 +238,10 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
     @Override
     @SuppressWarnings("unchecked")
     public void get(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
-        String resp = "";
         Gson gson = new Gson();
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -255,19 +250,14 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, Integer.parseInt(body.get("id").toString()));
             ResultSet rs = ps.executeQuery();
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "");
-            map.put("content", DBUtil.getMap(rs));
-            resp = gson.toJson(map);
+            resp.put("content", DBUtil.getMap(rs));
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> map = new HashMap<>();
-            map.put("message", "gRPC服务器错误");
-            resp = gson.toJson(map);
+            resp.put("message", "gRPC服务器错误");
         }
 
-        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
@@ -275,8 +265,10 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
     @Override
     @SuppressWarnings("unchecked")
     public void update(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
-        String resp = "";
         Gson gson = new Gson();
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -287,7 +279,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
                     "identity = ?, name = ?, birthday = ?, " +
                     "cangongshijian = ?, zhicheng = ?, gongling = ?, " +
                     "yutuixiuriqi = ?, tuixiuriqi = ?, vault_id = ?, " +
-                    "remark = ?, phone = ? " +
+                    "remark = ?, phone = ?, gender = ? " +
                     "where id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, body.get("sn").toString());
@@ -304,21 +296,16 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             ps.setInt(11, vaultId.intValue());
             ps.setString(12, body.get("remark").toString());
             ps.setString(13, body.get("phone").toString());
-            ps.setInt(14, d.intValue());
+            ps.setString(14, body.get("gender").toString());
+            ps.setInt(15, d.intValue());
             ps.execute();
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "");
-            map.put("content", "");
-            resp = gson.toJson(map);
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> map = new HashMap<>();
-            map.put("message", "gRPC服务器错误");
-            resp = gson.toJson(map);
+            resp.put("message", "gRPC服务器错误");
         }
 
-        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
@@ -326,8 +313,10 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
     @Override
     @SuppressWarnings("unchecked")
     public void remove(ArchiveRequest req, StreamObserver<ArchiveReply> responseObserver) {
-        String resp = "";
         Gson gson = new Gson();
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("message", "");
+        resp.put("content", "");
 
         try {
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -336,19 +325,13 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, Integer.parseInt(body.get("id").toString()));
             ps.execute();
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "");
-            map.put("content", "");
-            resp = gson.toJson(map);
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> map = new HashMap<>();
-            map.put("message", "gRPC服务器错误");
-            resp = gson.toJson(map);
+            resp.put("message", "gRPC服务器错误");
         }
 
-        ArchiveReply reply = ArchiveReply.newBuilder().setData(resp).build();
+        ArchiveReply reply = ArchiveReply.newBuilder().setData(gson.toJson(resp)).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
@@ -366,11 +349,11 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             String sql = "insert into himawari.archive " +
                     "(sn, sn_alt, identity, name, birthday, " +
                     "cangongshijian, zhicheng, gongling, yutuixiuriqi, tuixiuriqi, " +
-                    "remark, vault_id, phone) " +
+                    "remark, vault_id, phone, gender) " +
                     "values " +
                     "(?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, " +
-                    "?, ?, ?) " +
+                    "?, ?, ?, ?) " +
                     "returning id";
             PreparedStatement ps = conn.prepareStatement(sql);
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -389,6 +372,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             Double vault_id = Double.parseDouble((body.get("vault_id").toString()));
             ps.setInt(12, vault_id.intValue());
             ps.setString(13, body.get("phone").toString());
+            ps.setString(14, body.get("gender").toString());
             ResultSet rs = ps.executeQuery();
             resp.put("content", DBUtil.getMap(rs));
             sql = "delete from himawari.archive_isolate where id = ?";
@@ -420,11 +404,11 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             String sql = "insert into himawari.archive_isolate " +
                     "(original_id, sn, sn_alt, identity, name, birthday, " +
                     "cangongshijian, zhicheng, gongling, yutuixiuriqi, tuixiuriqi, " +
-                    "remark, vault_id, reason) " +
+                    "remark, vault_id, reason, gender) " +
                     "values " +
                     "(?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, " +
-                    "?, ?, ?) " +
+                    "?, ?, ?, ?) " +
                     "returning id";
             PreparedStatement ps = conn.prepareStatement(sql);
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -444,6 +428,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             Double vault_id = Double.parseDouble((body.get("vault_id").toString()));
             ps.setInt(13, vault_id.intValue());
             ps.setString(14, body.get("reason").toString());
+            ps.setString(15, body.get("gender").toString());
             ResultSet rs = ps.executeQuery();
             resp.put("content", DBUtil.getMap(rs));
             sql = "delete from himawari.archive where id = ?";
@@ -626,7 +611,7 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
                     "cangongshijian = ?, zhicheng = ?, gongling = ?, " +
                     "yutuixiuriqi = ?, tuixiuriqi = ?, " +
                     "remark = ?, vault_id = ?, " +
-                    "reason = ?, phone = ? " +
+                    "reason = ?, phone = ?, gender = ? " +
                     "where id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             Map<String, Object> body = gson.fromJson(req.getData(), Map.class);
@@ -645,8 +630,9 @@ public class ArchiveServiceImpl extends ArchiveGrpc.ArchiveImplBase {
             ps.setInt(12, vault_id.intValue());
             ps.setString(13, body.get("reason").toString());
             ps.setString(14, body.get("phone").toString());
+            ps.setString(15, body.get("gender").toString());
             Double id = Double.parseDouble(body.get("id").toString());
-            ps.setInt(15, id.intValue());
+            ps.setInt(16, id.intValue());
             ps.execute();
             conn.close();
         } catch (Exception e) {

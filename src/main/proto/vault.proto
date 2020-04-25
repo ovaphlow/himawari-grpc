@@ -7,11 +7,11 @@ option java_outer_classname = "VaultProto";
 package vault;
 
 service Vault {
-    rpc list(VaultRequest) returns (VaultReply) {}
-    rpc save(VaultRequest) returns (VaultReply) {}
-    rpc get(VaultRequest) returns (VaultReply) {}
-    rpc update(VaultRequest) returns (VaultReply) {}
-    rpc remove(VaultRequest) returns (VaultReply) {}
+    rpc list (VaultRequest) returns (VaultReply) {}
+    rpc save (VaultRequest) returns (VaultReply) {}
+    rpc get (VaultRequest) returns (VaultReply) {}
+    rpc update (VaultRequest) returns (VaultReply) {}
+    rpc remove (VaultRequest) returns (VaultReply) {}
 }
 
 message VaultRequest { string data = 1; }
